@@ -5,6 +5,7 @@ import Pokemon from "../components/Pokemon";
 import Header from "../components/Header";
 
 export interface PokemonProps {
+  id: string;
   name: string;
   sprites: {
     front_default: string;
