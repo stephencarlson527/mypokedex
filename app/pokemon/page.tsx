@@ -5,6 +5,7 @@ import Pokemon from "../components/Pokemon";
 import Header from "../components/Header";
 
 export interface PokemonProps {
+  id: string;
   name: string;
   sprites: {
     front_default: string;
@@ -72,6 +73,7 @@ const PokemonDetail = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {pokemonList.map((pokemon) => (
             <Pokemon
+              id={pokemon.id}
               key={pokemon.id}
               name={pokemon.name}
               sprites={pokemon.sprites}
