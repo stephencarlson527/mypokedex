@@ -1,0 +1,16 @@
+/* Pokemon.module.css */
+.card {
+  @apply bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center transition-transform transform hover:scale-105;
+}
+
+.pokemonImage {
+  @apply mx-auto mb-4 rounded-md border border-gray-300 dark:border-gray-700;
+}
+
+.pokemonStats {
+  @apply text-sm text-gray-600 dark:text-gray-400;
+}
+
+.loader {
+  @apply text-center text-gray-600 dark:text-gray-400;
+}
