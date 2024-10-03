@@ -8,6 +8,7 @@ Portfolio TODO
 - Useful and easy to use Weaknesses chart/ form where you tpye in a pokemon name then it spits out all of the pokemon that it can either kill or be killed by etc... NOTE: Each pokemon wherever it's shown should have it's type on it's card or on hover in a tooltip
 - Create a modal for Pokemon details... can be basic UI At first but then made into something cool
 - See if you can find free music and add that to the site
+
 - Pages/ Architecture - 
 - Home
  - General updates - 
@@ -24,3 +25,22 @@ Portfolio TODO
    - Available Moves
  - Team Builder - reference https://www.pikalytics.com/team
  - Dark Mode Toggle
+
+ TODO Next - 
+ Pokemon Details Modal Component on click of card
+ *Notes and ideas from pokeMMO Pokedex
+ - Summary
+ - Moves
+ - Base Stats
+ - Wild Locations
+ - Evolution tree
+
+ - Add Sorting dropdown
+
+ - Add searchbar
+
+ - Bugs/ Enhancements - 
+ - Update grid design and pokemon card size and maybe update the sprites to something better looking
+
+
+
