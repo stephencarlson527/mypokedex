@@ -5,6 +5,7 @@ import Pokemon from "./Pokemon";
 import Header from "./Header";
 import LoadingState from "./LoadingState";
 import SortDropdown from "./SortDropdown";
+import PokemonDetail from "./PokemonDetail";
 
 export interface PokemonProps {
   id: string;
@@ -15,6 +16,10 @@ export interface PokemonProps {
   height: number;
   weight: number;
   base_experience: number;
+  types: Array<{ type: { name: string } }>; // Add type
+  abilities: Array<{ ability: { name: string } }>; // Add abilities
+  description?: string; // Add description
+  onClick: () => void;
 }
 
 interface PokemonDetailProps {
@@ -47,6 +52,8 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   const [showLoader, setShowLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState(""); // Default to empty for no sorting
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(null); // For modal
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const loader = useRef<HTMLDivElement | null>(null);
   const loadedIds = useRef<Set<number>>(new Set(initialPokemon.map(pokemon => +pokemon.id))); // Initialize with IDs from initial Pokémon
 
@@ -115,6 +122,16 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     }
   }, [sortBy]);
 
+  const openModal = (pokemon: PokemonProps) => {
+    setSelectedPokemon(pokemon);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPokemon(null);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -130,6 +147,9 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
               height={pokemon.height}
               weight={pokemon.weight}
               base_experience={pokemon.base_experience}
+              types={pokemon.types}
+              abilities={pokemon.abilities}
+              onClick={() => openModal(pokemon)} // Open modal on click
             />
           ))}
         </div>
@@ -137,6 +157,11 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
           <LoadingState loading={loading} showLoader={showLoader} />
         </div>
       </div>
+      <PokemonDetail
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        pokemon={selectedPokemon}
+      />
     </div>
   );
 };

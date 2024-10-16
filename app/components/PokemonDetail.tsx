@@ -2,6 +2,7 @@
 import React from "react";
 import Modal from "react-modal";
 import { PokemonProps } from "./PokemonList"; // Adjust the import based on your structure
+import Home from "../page";
 
 interface PokemonDetailModalProps {
   isOpen: boolean;
@@ -9,7 +10,7 @@ interface PokemonDetailModalProps {
   pokemon: PokemonProps | null;
 }
 
-const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
+const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
   isOpen,
   onRequestClose,
   pokemon,
@@ -23,6 +24,7 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
       contentLabel="Pokemon Details"
       className="modal"
       overlayClassName="overlay"
+      appElement={<Home />}
     >
       <div className="flex">
         {/* First Column: Pokémon Image with Name and Number */}
@@ -63,4 +65,4 @@ const PokemonDetailModal: React.FC<PokemonDetailModalProps> = ({
   );
 };
 
-export default PokemonDetailModal;
+export default PokemonDetail;

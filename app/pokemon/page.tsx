@@ -1,5 +1,5 @@
 import React from "react";
-import PokemonDetail, { PokemonProps } from "../components/PokemonList";
+import PokemonList, { PokemonProps } from "../components/PokemonList";
 
 // Server-side function to fetch Pokémon data
 const fetchPokemon = async (amount: number): Promise<PokemonProps[]> => {
@@ -17,7 +17,7 @@ const PokemonPage = async () => {
   const initialPokemon = await fetchPokemon(20);
 
   // Pass the initial data to the client component
-  return <PokemonDetail initialPokemon={initialPokemon} />;
+  return <PokemonList initialPokemon={initialPokemon} />;
 };
 
 export default PokemonPage;

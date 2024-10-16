@@ -2,11 +2,11 @@
 
 import React from "react";
 import styles from "./Pokemon.module.css"; // Adjust the import path if necessary
-import { PokemonProps } from "../pokemon/page";
+import { PokemonProps } from "../components/PokemonList";
 
-const Pokemon: React.FC<PokemonProps> = ({ name, sprites, height, weight, base_experience }) => {
+const Pokemon: React.FC<PokemonProps> = ({ name, sprites, height, weight, base_experience, onClick }) => {
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick}>
       <h2 className="text-2xl font-bold mb-2">{name.charAt(0).toUpperCase() + name.slice(1)}</h2>
       <img className={styles.pokemonImage} src={sprites.front_default} alt={name} />
       <p className={styles.pokemonStats}>Height: {height} decimetres</p>
