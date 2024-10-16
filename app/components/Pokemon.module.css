@@ -1,4 +1,6 @@
 /* Pokemon.module.css */
+/* // #3DFEC8 */
+
 .card {
   @apply bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 text-center transition-transform transform hover:scale-105;
 }

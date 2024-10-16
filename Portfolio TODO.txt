@@ -11,8 +11,11 @@ Portfolio TODO
 
 - Pages/ Architecture - 
 - Home
+ -> pokemon
+  -> pokemon/{pikachu}
+ -> 
  - General updates - 
-  - Create api calls server side
+  X Create api calls server side
   - Create tests as you go
  - MyPokedex/ Pokedex page ( Grid )
   - Add shiney pokemon toggle

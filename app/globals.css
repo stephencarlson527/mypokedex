@@ -3,15 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #3DFEC8;
+  --background: #cacaca;
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -24,6 +17,10 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.home-bg {
+  background: #3DFEC8;
 }
 
 h1 {
