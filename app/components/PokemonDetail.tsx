@@ -24,7 +24,6 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
       contentLabel="Pokemon Details"
       className="modal"
       overlayClassName="overlay"
-      appElement={<Home />}
     >
       <div className="flex">
         {/* First Column: Pokémon Image with Name and Number */}
