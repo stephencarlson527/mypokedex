@@ -32,22 +32,40 @@ const fetchMorePokemon = async (
   lastLoadedId: number
 ): Promise<PokemonProps[]> => {
   const apiUrl = process.env.NEXT_PUBLIC_POKEAPI_BASE_URL;
+  const showdownBaseUrl = "https://play.pokemonshowdown.com/sprites/xyani/"; // Showdown sprite URL base
+
   const newPokemonPromises: Promise<PokemonProps>[] = [];
 
   for (let i = lastLoadedId + 1; i <= lastLoadedId + amount; i++) {
-    newPokemonPromises.push(fetch(`${apiUrl}${i}`).then((res) => res.json()));
+    const pokemonData = await fetch(`${apiUrl}${i}`).then((res) => res.json());
+
+    // Construct the Showdown sprite URL based on the Pokémon's name
+    const showdownSpriteUrl = `${showdownBaseUrl}${pokemonData.name.toLowerCase()}.gif`;
+
+    newPokemonPromises.push(
+      Promise.resolve({
+        ...pokemonData,
+        sprites: {
+          ...pokemonData.sprites,
+          showdown: showdownSpriteUrl, // Add the Showdown sprite URL
+        },
+      })
+    );
   }
 
   return Promise.all(newPokemonPromises);
 };
 
 const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
-  const [pokemonList, setPokemonList] = useState<PokemonProps[]>(initialPokemon);
+  const [pokemonList, setPokemonList] =
+    useState<PokemonProps[]>(initialPokemon);
   const [loading, setLoading] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState(""); // Default to empty for no sorting
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(null); // For modal
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(
+    null
+  ); // For modal
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const loader = useRef<HTMLDivElement | null>(null);
   const lastLoadedId = useRef<number>(initialPokemon.length); // Track the last loaded ID, starting from initial data
@@ -101,7 +119,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   useEffect(() => {
     // Sort only when the user selects a valid option
     if (sortBy) {
-      const [sortProperty, order] = sortBy.split('-'); // Split to get property and order
+      const [sortProperty, order] = sortBy.split("-"); // Split to get property and order
       const sortedList = [...pokemonList].sort((a, b) => {
         let comparison = 0;
 
@@ -133,6 +151,30 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     setSelectedPokemon(null);
   };
 
+  // Handler to find the previous Pokémon
+  const handlePrevious = () => {
+    if (!selectedPokemon) return;
+    const currentIndex = pokemonList.findIndex(
+      (p) => p.id === selectedPokemon.id
+    );
+    if (currentIndex > 0) {
+      const previousPokemon = pokemonList[currentIndex - 1];
+      setSelectedPokemon(previousPokemon);
+    }
+  };
+
+  // Handler to find the next Pokémon
+  const handleNext = () => {
+    if (!selectedPokemon) return;
+    const currentIndex = pokemonList.findIndex(
+      (p) => p.id === selectedPokemon.id
+    );
+    if (currentIndex < pokemonList.length - 1) {
+      const nextPokemon = pokemonList[currentIndex + 1];
+      setSelectedPokemon(nextPokemon);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -162,6 +204,8 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
         isOpen={isModalOpen}
         onRequestClose={closeModal}
         pokemon={selectedPokemon}
+        onPrevious={handlePrevious} // Pass the previous handler
+        onNext={handleNext} // Pass the next handler
       />
     </div>
   );

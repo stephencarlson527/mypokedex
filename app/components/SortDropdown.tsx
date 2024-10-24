@@ -1,4 +1,6 @@
 import React from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 interface SortDropdownProps {
   sortBy: string;
@@ -6,36 +8,50 @@ interface SortDropdownProps {
 }
 
 const SortDropdown: React.FC<SortDropdownProps> = ({ sortBy, setSortBy }) => {
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortBy(event.target.value);
-  };
+  const options = [
+    { value: 'id-asc', label: 'Pokémon Number Ascending' },
+    { value: 'id-desc', label: 'Pokémon Number Descending' },
+    { value: 'name-asc', label: 'Name A-Z' },
+    { value: 'name-desc', label: 'Name Z-A' },
+    { value: 'height-asc', label: 'Height Short-Tall' },
+    { value: 'height-desc', label: 'Height Tall-Short' },
+    { value: 'weight-asc', label: 'Weight Light-Heavy' },
+    { value: 'weight-desc', label: 'Weight Heavy-Light' },
+    { value: 'base_experience-asc', label: 'Base Experience Low-High' },
+    { value: 'base_experience-desc', label: 'Base Experience High-Low' }
+  ];
 
   return (
-    <div className="w-full max-w-xs mx-auto mb-4">
-      <label htmlFor="sort" className="block text-sm font-medium text-gray-700 mb-1">
-        Sort Pokémon ( 20 at a time ):
-      </label>
-      <select
-        id="sort"
-        value={sortBy}
-        onChange={handleChange}
-        className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    <Menu as="div" className="relative inline-block text-left">
+      <div>
+        <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+          Sort Options
+          <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+        </MenuButton>
+      </div>
+
+      <MenuItems
+        className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none"
       >
-        <option value="" disabled>
-          Select sorting option...
-        </option>
-        <option value="id-asc">Pokémon Number Ascending</option>
-        <option value="id-desc">Pokémon Number Descending</option>
-        <option value="name-asc">Name A-Z</option>
-        <option value="name-desc">Name Z-A</option>
-        <option value="height-asc">Height Short-Tall</option>
-        <option value="height-desc">Height Tall-Short</option>
-        <option value="weight-asc">Weight Light-Heavy</option>
-        <option value="weight-desc">Weight Heavy-Light</option>
-        <option value="base_experience-asc">Base Experience Low-High</option>
-        <option value="base_experience-desc">Base Experience High-Low</option>
-      </select>
-    </div>
+        {options.map((option) => (
+          <div key={option.value} className="py-1">
+            <MenuItem>
+              {({ active }) => (
+                <a
+                  href="#"
+                  className={`block px-4 py-2 text-sm ${
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                  }`}
+                  onClick={() => setSortBy(option.value)}
+                >
+                  {option.label}
+                </a>
+              )}
+            </MenuItem>
+          </div>
+        ))}
+      </MenuItems>
+    </Menu>
   );
 };
 

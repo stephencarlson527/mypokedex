@@ -1,20 +1,25 @@
-// PokemonDetailModal.tsx
-import React from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
 import { PokemonProps } from "./PokemonList"; // Adjust the import based on your structure
-import Home from "../page";
+import styles from "./PokemonDetail.module.css"; // Import custom styles for this modal
 
 interface PokemonDetailModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
   pokemon: PokemonProps | null;
+  onPrevious: () => void;
+  onNext: () => void;
 }
 
 const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
   isOpen,
   onRequestClose,
   pokemon,
+  onPrevious,
+  onNext,
 }) => {
+  const [activeTab, setActiveTab] = useState("Summary");
+
   if (!pokemon) return null;
 
   return (
@@ -22,44 +27,101 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Pokemon Details"
-      className="modal"
-      overlayClassName="overlay"
+      className={styles.modal}
+      overlayClassName={styles.overlay}
     >
-      <div className="flex">
-        {/* First Column: Pokémon Image with Name and Number */}
-        <div className="flex flex-col items-center w-1/3">
-          <h2 className="text-xl font-bold">
-            #{pokemon.id} {pokemon.name}
-          </h2>
+      {/* Close Button (X) */}
+      <button onClick={onRequestClose} className={styles.closeButton}>
+        &times;
+      </button>
+
+      <div className={styles.container}>
+        {/* Left Column: Sprite and Navigation Buttons */}
+        <div className={styles.leftColumn}>
+        <h2>No. {pokemon.id} {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1).toLowerCase()}</h2>
+
           <img
             src={pokemon.sprites.front_default}
             alt={pokemon.name}
-            className="w-40 h-40"
+            className={styles.sprite}
           />
+
+          {/* Navigation Buttons */}
+          <div className={styles.navButtons}>
+            <button onClick={onPrevious} className={styles.navButton}>Previous</button>
+            <button onClick={onNext} className={styles.navButton}>Next</button>
+          </div>
         </div>
 
-        {/* Second Column: Headings */}
-        <div className="w-1/3">
-          <h3 className="font-bold">Details</h3>
-          <p>Type</p>
-          <p>Description</p>
-          <p>Abilities</p>
-          <p>Height</p>
-          <p>Weight</p>
-        </div>
+        {/* Right Column: Tabs */}
+        <div className={styles.rightColumn}>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === "Summary" ? styles.activeTab : ""}`}
+              onClick={() => setActiveTab("Summary")}
+            >
+              Summary
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === "Moves" ? styles.activeTab : ""}`}
+              onClick={() => setActiveTab("Moves")}
+            >
+              Moves
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === "Base Stats" ? styles.activeTab : ""}`}
+              onClick={() => setActiveTab("Base Stats")}
+            >
+              Base Stats
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === "Evolution" ? styles.activeTab : ""}`}
+              onClick={() => setActiveTab("Evolution")}
+            >
+              Evolution
+            </button>
+          </div>
 
-        {/* Third Column: Details */}
-        <div className="w-1/3">
-          <p>{pokemon.types.map(type => type.type.name).join(", ")}</p>
-          <p>{pokemon.description || "No description available."}</p>
-          <p>{pokemon.abilities.map(ability => ability.ability.name).join(", ")}</p>
-          <p>{pokemon.height}</p>
-          <p>{pokemon.weight}</p>
+          {/* Content under each tab */}
+          <div className={styles.tabContent}>
+            {activeTab === "Summary" && (
+              <div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoTitle}>Type</div>
+                  <div className={styles.infoContent}>
+                    {pokemon.types.map(type => type.type.name).join(' / ')}
+                  </div>
+                </div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoTitle}>Desc</div>
+                  <div className={styles.infoContent}>
+                    {pokemon.description || "No description available."}
+                  </div>
+                </div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoTitle}>Abilities</div>
+                  <div className={styles.infoContent}>
+                    {pokemon.abilities.map(ability => ability.ability.name).join(' / ')}
+                  </div>
+                </div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoTitle}>Height</div>
+                  <div className={styles.infoContent}>{pokemon.height}'</div>
+                </div>
+                <div className={styles.infoRow}>
+                  <div className={styles.infoTitle}>Weight</div>
+                  <div className={styles.infoContent}>{pokemon.weight} lbs.</div>
+                </div>
+              </div>
+            )}
+
+            {/* Placeholder for other tabs */}
+            {activeTab === "Moves" && <div>Moves content will go here.</div>}
+            {activeTab === "Base Stats" && <div>Base Stats content will go here.</div>}
+            {activeTab === "Evolution" && <div>Evolution content will go here.</div>}
+          </div>
         </div>
       </div>
-      <button onClick={onRequestClose} className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
-        Close
-      </button>
     </Modal>
   );
 };
