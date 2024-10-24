@@ -8,17 +8,18 @@ import SortDropdown from "./SortDropdown";
 import PokemonDetail from "./PokemonDetail";
 
 export interface PokemonProps {
-  id: string;
+  id: number; // Changed to number instead of string for consistency
   name: string;
   sprites: {
     front_default: string;
+    showdown?: string;
   };
   height: number;
   weight: number;
   base_experience: number;
-  types: Array<{ type: { name: string } }>; // Add type
-  abilities: Array<{ ability: { name: string } }>; // Add abilities
-  description?: string; // Add description
+  types: Array<{ type: { name: string } }>;
+  abilities: Array<{ ability: { name: string } }>;
+  description?: string;
   onClick: () => void;
 }
 
@@ -28,19 +29,13 @@ interface PokemonDetailProps {
 
 const fetchMorePokemon = async (
   amount: number,
-  loadedIds: Set<number>
+  lastLoadedId: number
 ): Promise<PokemonProps[]> => {
   const apiUrl = process.env.NEXT_PUBLIC_POKEAPI_BASE_URL;
   const newPokemonPromises: Promise<PokemonProps>[] = [];
 
-  while (newPokemonPromises.length < amount) {
-    const randomId = Math.floor(Math.random() * 898) + 1; // Generate random Pokémon ID
-
-    // Only add if this ID hasn't been loaded yet
-    if (!loadedIds.has(randomId)) {
-      loadedIds.add(randomId); // Mark this ID as loaded
-      newPokemonPromises.push(fetch(`${apiUrl}${randomId}`).then((res) => res.json()));
-    }
+  for (let i = lastLoadedId + 1; i <= lastLoadedId + amount; i++) {
+    newPokemonPromises.push(fetch(`${apiUrl}${i}`).then((res) => res.json()));
   }
 
   return Promise.all(newPokemonPromises);
@@ -55,7 +50,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(null); // For modal
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const loader = useRef<HTMLDivElement | null>(null);
-  const loadedIds = useRef<Set<number>>(new Set(initialPokemon.map(pokemon => +pokemon.id))); // Initialize with IDs from initial Pokémon
+  const lastLoadedId = useRef<number>(initialPokemon.length); // Track the last loaded ID, starting from initial data
 
   const loadMorePokemon = async (amount: number) => {
     setLoading(true);
@@ -65,8 +60,12 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
       setShowLoader(true);
     }, 500);
 
-    const newPokemon = await fetchMorePokemon(amount, loadedIds.current);
+    const newPokemon = await fetchMorePokemon(amount, lastLoadedId.current);
     setPokemonList((prev) => [...prev, ...newPokemon]); // Append new Pokémon at the end
+
+    // Update last loaded ID
+    lastLoadedId.current = lastLoadedId.current + amount;
+
     setLoading(false);
     setShowLoader(false);
     clearTimeout(loaderTimeout);
@@ -95,7 +94,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
 
   useEffect(() => {
     if (page > 1) {
-      loadMorePokemon(20);
+      loadMorePokemon(20); // Load 20 more Pokémon on scroll
     }
   }, [page]);
 
@@ -114,6 +113,8 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
           comparison = a.weight - b.weight;
         } else if (sortProperty === "base_experience") {
           comparison = a.base_experience - b.base_experience;
+        } else if (sortProperty === "id") {
+          comparison = a.id - b.id;
         }
 
         return order === "asc" ? comparison : -comparison; // Return in ascending or descending order
