@@ -106,7 +106,7 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
                 </div>
                 <div className={styles.infoRow}>
                   <div className={styles.infoTitle}>Height</div>
-                  <div className={styles.infoContent}>{pokemon.height}'</div>
+                  <div className={styles.infoContent}>{pokemon.height}</div>
                 </div>
                 <div className={styles.infoRow}>
                   <div className={styles.infoTitle}>Weight</div>

@@ -11,7 +11,7 @@ const Pokemon: React.FC<PokemonProps> = ({
   types,
   onClick,
   id,
-  abilities,
+  // abilities,
 }) => {
 
   return (

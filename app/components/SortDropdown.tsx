@@ -7,7 +7,7 @@ interface SortDropdownProps {
   setSortBy: (sortOption: string) => void;
 }
 
-const SortDropdown: React.FC<SortDropdownProps> = ({ sortBy, setSortBy }) => {
+const SortDropdown: React.FC<SortDropdownProps> = ({ setSortBy }) => {
   const options = [
     { value: 'id-asc', label: 'Pokémon Number Ascending' },
     { value: 'id-desc', label: 'Pokémon Number Descending' },
