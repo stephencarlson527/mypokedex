@@ -4,7 +4,7 @@ import PokemonList, { PokemonProps } from "../components/PokemonList";
 // Server-side function to fetch Pokémon data, including Showdown sprites
 const fetchPokemon = async (amount: number): Promise<PokemonProps[]> => {
   const apiUrl = process.env.NEXT_PUBLIC_POKEAPI_BASE_URL;
-  const showdownBaseUrl = "https://play.pokemonshowdown.com/sprites/xyani/";
+  const showdownBaseUrl = process.env.NEXT_PUBLIC_SHOWDNOWN_BASE_URL;
 
   // Iterate sequentially from Pokémon #1 up to the amount specified
   const promises = Array.from({ length: amount }, async (_, index) => {
@@ -28,7 +28,7 @@ const fetchPokemon = async (amount: number): Promise<PokemonProps[]> => {
 
 const PokemonPage = async () => {
   // Fetch initial Pokémon data starting from #1, with the specified amount
-  const initialPokemon = await fetchPokemon(20);
+  const initialPokemon = await fetchPokemon(60);
 
   // Pass the initial data to the client component
   return <PokemonList initialPokemon={initialPokemon} />;

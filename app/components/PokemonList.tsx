@@ -1,3 +1,4 @@
+// components/PokemonList.tsx
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
@@ -6,9 +7,10 @@ import Header from "./Header";
 import LoadingState from "./LoadingState";
 import SortDropdown from "./SortDropdown";
 import PokemonDetail from "./PokemonDetail";
+import SearchBar from "./SearchBar";
 
 export interface PokemonProps {
-  id: number; // Changed to number instead of string for consistency
+  id: number;
   name: string;
   sprites: {
     front_default: string;
@@ -32,14 +34,13 @@ const fetchMorePokemon = async (
   lastLoadedId: number
 ): Promise<PokemonProps[]> => {
   const apiUrl = process.env.NEXT_PUBLIC_POKEAPI_BASE_URL;
-  const showdownBaseUrl = "https://play.pokemonshowdown.com/sprites/xyani/"; // Showdown sprite URL base
+  const showdownBaseUrl = process.env.NEXT_PUBLIC_SHOWDNOWN_BASE_URL;
 
   const newPokemonPromises: Promise<PokemonProps>[] = [];
 
-  for (let i = lastLoadedId + 1; i <= lastLoadedId + amount; i++) {
+  for (let i = lastLoadedId + 1; i <= lastLoadedId + amount && i <= 721; i++) {
     const pokemonData = await fetch(`${apiUrl}${i}`).then((res) => res.json());
 
-    // Construct the Showdown sprite URL based on the Pokémon's name
     const showdownSpriteUrl = `${showdownBaseUrl}${pokemonData.name.toLowerCase()}.gif`;
 
     newPokemonPromises.push(
@@ -47,7 +48,7 @@ const fetchMorePokemon = async (
         ...pokemonData,
         sprites: {
           ...pokemonData.sprites,
-          showdown: showdownSpriteUrl, // Add the Showdown sprite URL
+          showdown: showdownSpriteUrl,
         },
       })
     );
@@ -57,20 +58,24 @@ const fetchMorePokemon = async (
 };
 
 const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
-  const [pokemonList, setPokemonList] =
-    useState<PokemonProps[]>(initialPokemon);
+  const [pokemonList, setPokemonList] = useState<PokemonProps[]>(initialPokemon);
+  const [filteredPokemon, setFilteredPokemon] = useState<PokemonProps[]>(initialPokemon);
   const [loading, setLoading] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState(""); // Default to empty for no sorting
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(
-    null
-  ); // For modal
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
+  const [sortBy, setSortBy] = useState("");
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const loader = useRef<HTMLDivElement | null>(null);
-  const lastLoadedId = useRef<number>(initialPokemon.length); // Track the last loaded ID, starting from initial data
+  const lastLoadedId = useRef<number>(initialPokemon.length);
 
   const loadMorePokemon = async (amount: number) => {
+    // Stop loading if we've reached Pokémon #721
+    if (lastLoadedId.current >= 721) {
+      setShowLoader(false);
+      return;
+    }
+
     setLoading(true);
     setShowLoader(false);
 
@@ -79,11 +84,10 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     }, 500);
 
     const newPokemon = await fetchMorePokemon(amount, lastLoadedId.current);
-    setPokemonList((prev) => [...prev, ...newPokemon]); // Append new Pokémon at the end
+    setPokemonList((prev) => [...prev, ...newPokemon]);
+    setFilteredPokemon((prev) => [...prev, ...newPokemon]);
 
-    // Update last loaded ID
-    lastLoadedId.current = lastLoadedId.current + amount;
-
+    lastLoadedId.current += newPokemon.length; // Update lastLoadedId by the actual number of Pokémon loaded
     setLoading(false);
     setShowLoader(false);
     clearTimeout(loaderTimeout);
@@ -92,7 +96,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && !loading && lastLoadedId.current < 721) {
           setPage((prev) => prev + 1);
         }
       },
@@ -108,19 +112,18 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
         observer.unobserve(loader.current);
       }
     };
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
-    if (page > 1) {
+    if (page > 1 && lastLoadedId.current < 721) {
       loadMorePokemon(20); // Load 20 more Pokémon on scroll
     }
   }, [page]);
 
   useEffect(() => {
-    // Sort only when the user selects a valid option
     if (sortBy) {
-      const [sortProperty, order] = sortBy.split("-"); // Split to get property and order
-      const sortedList = [...pokemonList].sort((a, b) => {
+      const [sortProperty, order] = sortBy.split("-");
+      const sortedList = [...filteredPokemon].sort((a, b) => {
         let comparison = 0;
 
         if (sortProperty === "name") {
@@ -135,9 +138,9 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
           comparison = a.id - b.id;
         }
 
-        return order === "asc" ? comparison : -comparison; // Return in ascending or descending order
+        return order === "asc" ? comparison : -comparison;
       });
-      setPokemonList(sortedList);
+      setFilteredPokemon(sortedList);
     }
   }, [sortBy]);
 
@@ -151,37 +154,48 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     setSelectedPokemon(null);
   };
 
-  // Handler to find the previous Pokémon
   const handlePrevious = () => {
     if (!selectedPokemon) return;
-    const currentIndex = pokemonList.findIndex(
+    const currentIndex = filteredPokemon.findIndex(
       (p) => p.id === selectedPokemon.id
     );
     if (currentIndex > 0) {
-      const previousPokemon = pokemonList[currentIndex - 1];
+      const previousPokemon = filteredPokemon[currentIndex - 1];
       setSelectedPokemon(previousPokemon);
     }
   };
 
-  // Handler to find the next Pokémon
   const handleNext = () => {
     if (!selectedPokemon) return;
-    const currentIndex = pokemonList.findIndex(
+    const currentIndex = filteredPokemon.findIndex(
       (p) => p.id === selectedPokemon.id
     );
-    if (currentIndex < pokemonList.length - 1) {
-      const nextPokemon = pokemonList[currentIndex + 1];
+    if (currentIndex < filteredPokemon.length - 1) {
+      const nextPokemon = filteredPokemon[currentIndex + 1];
       setSelectedPokemon(nextPokemon);
     }
+  };
+
+  const handleSearch = (query: string) => {
+    const lowercaseQuery = query.toLowerCase();
+    const filtered = pokemonList.filter(
+      (pokemon) =>
+        pokemon.name.toLowerCase().includes(lowercaseQuery) ||
+        pokemon.id.toString().includes(query)
+    );
+    setFilteredPokemon(filtered);
   };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="m-16 flex flex-col items-center justify-center min-h-screen">
-        <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
+        <div className="flex items-center p-8">
+          <SearchBar onSearch={handleSearch} />
+          <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {pokemonList.map((pokemon) => (
+          {filteredPokemon.map((pokemon) => (
             <Pokemon
               id={pokemon.id}
               key={pokemon.id}
@@ -192,20 +206,22 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
               base_experience={pokemon.base_experience}
               types={pokemon.types}
               abilities={pokemon.abilities}
-              onClick={() => openModal(pokemon)} // Open modal on click
+              onClick={() => openModal(pokemon)}
             />
           ))}
         </div>
-        <div ref={loader} className="loader mt-4">
-          <LoadingState loading={loading} showLoader={showLoader} />
-        </div>
+        {lastLoadedId.current < 721 && (
+          <div ref={loader} className="loader mt-4">
+            <LoadingState loading={loading} showLoader={showLoader} />
+          </div>
+        )}
       </div>
       <PokemonDetail
         isOpen={isModalOpen}
         onRequestClose={closeModal}
         pokemon={selectedPokemon}
-        onPrevious={handlePrevious} // Pass the previous handler
-        onNext={handleNext} // Pass the next handler
+        onPrevious={handlePrevious}
+        onNext={handleNext}
       />
     </div>
   );
