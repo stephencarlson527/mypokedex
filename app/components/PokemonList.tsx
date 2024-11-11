@@ -8,6 +8,7 @@ import LoadingState from "./LoadingState";
 import SortDropdown from "./SortDropdown";
 import PokemonDetail from "./PokemonDetail";
 import SearchBar from "./SearchBar";
+import Button from "./Button";
 
 export interface PokemonProps {
   id: number;
@@ -58,16 +59,22 @@ const fetchMorePokemon = async (
 };
 
 const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
-  const [pokemonList, setPokemonList] = useState<PokemonProps[]>(initialPokemon);
-  const [filteredPokemon, setFilteredPokemon] = useState<PokemonProps[]>(initialPokemon);
+  const [pokemonList, setPokemonList] =
+    useState<PokemonProps[]>(initialPokemon);
+  const [filteredPokemon, setFilteredPokemon] =
+    useState<PokemonProps[]>(initialPokemon);
   const [loading, setLoading] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("");
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(null);
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loader = useRef<HTMLDivElement | null>(null);
+  const searchBarRef = useRef<HTMLDivElement | null>(null);
   const lastLoadedId = useRef<number>(initialPokemon.length);
+  const [showBackToTop, setShowBackToTop] = useState(false); // State to manage visibility of "Back to Top" button
 
   const loadMorePokemon = async (amount: number) => {
     // Stop loading if we've reached Pokémon #721
@@ -93,10 +100,26 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     clearTimeout(loaderTimeout);
   };
 
+  const handleScroll = () => {
+    if (searchBarRef.current) {
+      const { bottom } = searchBarRef.current.getBoundingClientRect();
+      setShowBackToTop(bottom <= 0); // Show button only if search bar is out of view
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !loading && lastLoadedId.current < 721) {
+        if (
+          entries[0].isIntersecting &&
+          !loading &&
+          lastLoadedId.current < 721
+        ) {
           setPage((prev) => prev + 1);
         }
       },
@@ -186,11 +209,15 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     setFilteredPokemon(filtered);
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="m-16 flex flex-col items-center justify-center min-h-screen">
-        <div className="flex items-center p-8">
+        <div ref={searchBarRef} className="flex items-center p-8">
           <SearchBar onSearch={handleSearch} />
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
         </div>
@@ -223,6 +250,12 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
         onPrevious={handlePrevious}
         onNext={handleNext}
       />
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <div className="fixed bottom-4 right-4 p-3 rounded-full">
+          <Button handleClick={scrollToTop} buttonText="Back To Top" />
+        </div>
+      )}
     </div>
   );
 };
