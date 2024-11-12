@@ -39,7 +39,7 @@ export default function SearchBar({ onSearch, hasError }: SearchBarProps) {
       </div>
       {hasError && (
         <p className="text-red-500 text-sm mt-2">
-          No Pokémon found matching "{query}"
+          No Pokémon found matching `&quot`{query}`&quot`
         </p>
       )}
     </div>
