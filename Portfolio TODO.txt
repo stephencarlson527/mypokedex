@@ -1,4 +1,0 @@
-Portfolio TODO
-
-- Create MyPokedex Page -> I'm just gonna use this site as a playground... can always abstract it into it's own repo eventually
-- lookup 

@@ -1,0 +1,124 @@
+/* PokemonDetail.module.css */
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #3c5066;
+    padding: 40px;
+    border-radius: 10px;
+    width: 800px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    position: relative;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+  }
+  
+  .leftColumn {
+    width: 35%;
+    text-align: center;
+  }
+  
+  .sprite {
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+  }
+  
+  .navButtons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  
+  .navButton {
+    background-color: #4c677d;
+    border: 1px solid #2c3f55;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    width: 100px;
+  }
+  
+  .rightColumn {
+    width: 60%;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .tab {
+    background-color: #4c677d;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+  }
+  
+  .activeTab {
+    background-color: #6c8ba4;
+    font-weight: bold;
+  }
+  
+  .tabContent {
+    background-color: #4c677d;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Updated Summary Info Alignment */
+  .infoRow {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .infoTitle {
+    font-weight: bold;
+    width: 100px; /* Ensures the labels are aligned */
+    margin-right: 20px; /* Creates spacing between the title and content */
+    border: 1px solid #8cbadd;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .infoContent {
+    background-color: #4c677d;
+    padding: 5px;
+    border-radius: 3px;
+    width: auto;
+    text-align: left;
+  }
+  .closeButton {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 36px;
+    cursor: pointer;
+  }
