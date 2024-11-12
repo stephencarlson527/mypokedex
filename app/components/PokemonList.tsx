@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Pokemon from "./Pokemon";
+import PokemonSkeleton from "./PokemonSkeleton";
 import Header from "./Header";
 import LoadingState from "./LoadingState";
 import SortDropdown from "./SortDropdown";
@@ -41,7 +42,6 @@ const fetchMorePokemon = async (
 
   for (let i = lastLoadedId + 1; i <= lastLoadedId + amount && i <= 721; i++) {
     const pokemonData = await fetch(`${apiUrl}${i}`).then((res) => res.json());
-
     const showdownSpriteUrl = `${showdownBaseUrl}${pokemonData.name.toLowerCase()}.gif`;
 
     newPokemonPromises.push(
@@ -59,25 +59,22 @@ const fetchMorePokemon = async (
 };
 
 const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
-  const [pokemonList, setPokemonList] =
-    useState<PokemonProps[]>(initialPokemon);
-  const [filteredPokemon, setFilteredPokemon] =
-    useState<PokemonProps[]>(initialPokemon);
+  const [pokemonList, setPokemonList] = useState<PokemonProps[]>(initialPokemon);
+  const [filteredPokemon, setFilteredPokemon] = useState<PokemonProps[]>(initialPokemon);
   const [loading, setLoading] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("");
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(
-    null
-  );
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const loader = useRef<HTMLDivElement | null>(null);
   const searchBarRef = useRef<HTMLDivElement | null>(null);
   const lastLoadedId = useRef<number>(initialPokemon.length);
   const [showBackToTop, setShowBackToTop] = useState(false); // State to manage visibility of "Back to Top" button
+  const [isSearching, setIsSearching] = useState(false); // Track if a search is in progress
+  const [hasError, setHasError] = useState(false); // Track if search returned no results
 
   const loadMorePokemon = async (amount: number) => {
-    // Stop loading if we've reached Pokémon #721
     if (lastLoadedId.current >= 721) {
       setShowLoader(false);
       return;
@@ -115,11 +112,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          !loading &&
-          lastLoadedId.current < 721
-        ) {
+        if (entries[0].isIntersecting && !loading && lastLoadedId.current < 721) {
           setPage((prev) => prev + 1);
         }
       },
@@ -200,6 +193,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   };
 
   const handleSearch = (query: string) => {
+    setIsSearching(true);
     const lowercaseQuery = query.toLowerCase();
     const filtered = pokemonList.filter(
       (pokemon) =>
@@ -207,6 +201,8 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
         pokemon.id.toString().includes(query)
     );
     setFilteredPokemon(filtered);
+    setHasError(filtered.length === 0); // Set error if no results
+    setIsSearching(false);
   };
 
   const scrollToTop = () => {
@@ -218,24 +214,28 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
       <Header />
       <div className="m-16 flex flex-col items-center justify-center min-h-screen">
         <div ref={searchBarRef} className="flex items-center p-8">
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} hasError={hasError} />
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {filteredPokemon.map((pokemon) => (
-            <Pokemon
-              id={pokemon.id}
-              key={pokemon.id}
-              name={pokemon.name}
-              sprites={pokemon.sprites}
-              height={pokemon.height}
-              weight={pokemon.weight}
-              base_experience={pokemon.base_experience}
-              types={pokemon.types}
-              abilities={pokemon.abilities}
-              onClick={() => openModal(pokemon)}
-            />
-          ))}
+          {(isSearching || loading || hasError)
+            ? Array.from({ length: 20 }).map((_, index) => (
+                <PokemonSkeleton key={index} />
+              ))
+            : filteredPokemon.map((pokemon) => (
+                <Pokemon
+                  id={pokemon.id}
+                  key={pokemon.id}
+                  name={pokemon.name}
+                  sprites={pokemon.sprites}
+                  height={pokemon.height}
+                  weight={pokemon.weight}
+                  base_experience={pokemon.base_experience}
+                  types={pokemon.types}
+                  abilities={pokemon.abilities}
+                  onClick={() => openModal(pokemon)}
+                />
+              ))}
         </div>
         {lastLoadedId.current < 721 && (
           <div ref={loader} className="loader mt-4">
@@ -250,7 +250,6 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
         onPrevious={handlePrevious}
         onNext={handleNext}
       />
-      {/* Back to Top Button */}
       {showBackToTop && (
         <div className="fixed bottom-4 right-4 p-3 rounded-full">
           <Button handleClick={scrollToTop} buttonText="Back To Top" />
