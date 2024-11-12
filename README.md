@@ -29,7 +29,7 @@ Check out the live demo here: [MyPokedex Demo](https://mypokedex-bice.vercel.app
 - **NextJS/React**: Component-based architecture for building user interfaces. Deployed via Vercel
 - **TypeScript**: Ensures type safety and improved developer experience.
 - **PokéAPI**: Retrieves data on all known Pokémon, abilities, types, and stats.
-- **CSS / Styled Components**: Custom styling for a visually appealing and consistent layout.
+- **CSS / Styled Components/ Tailwind**: Custom styling for a visually appealing and consistent layout.
 
 ## Installation
 
