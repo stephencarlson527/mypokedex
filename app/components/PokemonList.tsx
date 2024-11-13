@@ -74,11 +74,6 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   const [isSearching, setIsSearching] = useState(false); // Track if a search is in progress
   const [hasError, setHasError] = useState(false); // Track if search returned no results
 
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     Modal.setAppElement("#__next");
-  //   }
-  // }, []);
 
   const loadMorePokemon = async (amount: number) => {
     if (lastLoadedId.current >= 721) {
