@@ -10,7 +10,6 @@ import SortDropdown from "./SortDropdown";
 import PokemonDetail from "./PokemonDetail";
 import SearchBar from "./SearchBar";
 import Button from "./Button";
-import Modal from "react-modal"; // Import Modal from react-modal
 export interface PokemonProps {
   id: number;
   name: string;
