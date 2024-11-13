@@ -16,7 +16,7 @@ export default function SearchBar({ onSearch, hasError }: SearchBarProps) {
   };
 
   return (
-    <div className="flex flex-col items-center me-8" style={{ width: 350 }}>
+    <div className="flex flex-col items-center w-full sm:w-1/2 md:me-8">
       <div className="relative w-full">
         <input
           type="text"

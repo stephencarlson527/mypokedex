@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { PokemonProps } from "./PokemonList"; // Adjust the import based on your structure
 import styles from "./PokemonDetail.module.css"; // Import custom styles for this modal
@@ -19,6 +19,15 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
   onNext,
 }) => {
   const [activeTab, setActiveTab] = useState("Summary");
+  const [isAppElementSet, setIsAppElementSet] = useState(false);
+
+  useEffect(() => {
+    const appElement = document.getElementById("__next");
+    if (appElement) {
+      Modal.setAppElement(appElement);
+      setIsAppElementSet(true); // Update state once the app element is set
+    }
+  }, []);
 
   if (!pokemon) return null;
 
@@ -29,6 +38,7 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
       contentLabel="Pokemon Details"
       className={styles.modal}
       overlayClassName={styles.overlay}
+      ariaHideApp={isAppElementSet} 
     >
       {/* Close Button (X) */}
       <button onClick={onRequestClose} className={styles.closeButton}>
@@ -38,8 +48,7 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
       <div className={styles.container}>
         {/* Left Column: Sprite and Navigation Buttons */}
         <div className={styles.leftColumn}>
-        <h2>No. {pokemon.id} {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1).toLowerCase()}</h2>
-
+          <h2>No. {pokemon.id} {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1).toLowerCase()}</h2>
           <img
             src={pokemon.sprites.front_default}
             alt={pokemon.name}
@@ -89,7 +98,7 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
                 <div className={styles.infoRow}>
                   <div className={styles.infoTitle}>Type</div>
                   <div className={styles.infoContent}>
-                    {pokemon.types.map(type => type.type.name).join(' / ')}
+                    {pokemon.types.map(type => type.type.name).join(" / ")}
                   </div>
                 </div>
                 <div className={styles.infoRow}>
@@ -101,7 +110,7 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
                 <div className={styles.infoRow}>
                   <div className={styles.infoTitle}>Abilities</div>
                   <div className={styles.infoContent}>
-                    {pokemon.abilities.map(ability => ability.ability.name).join(' / ')}
+                    {pokemon.abilities.map(ability => ability.ability.name).join(" / ")}
                   </div>
                 </div>
                 <div className={styles.infoRow}>
@@ -114,8 +123,6 @@ const PokemonDetail: React.FC<PokemonDetailModalProps> = ({
                 </div>
               </div>
             )}
-
-            {/* Placeholder for other tabs */}
             {activeTab === "Moves" && <div>Moves content will go here.</div>}
             {activeTab === "Base Stats" && <div>Base Stats content will go here.</div>}
             {activeTab === "Evolution" && <div>Evolution content will go here.</div>}
