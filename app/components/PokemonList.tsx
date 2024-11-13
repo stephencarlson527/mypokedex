@@ -10,7 +10,7 @@ import SortDropdown from "./SortDropdown";
 import PokemonDetail from "./PokemonDetail";
 import SearchBar from "./SearchBar";
 import Button from "./Button";
-
+import Modal from "react-modal"; // Import Modal from react-modal
 export interface PokemonProps {
   id: number;
   name: string;
@@ -73,6 +73,12 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
   const [showBackToTop, setShowBackToTop] = useState(false); // State to manage visibility of "Back to Top" button
   const [isSearching, setIsSearching] = useState(false); // Track if a search is in progress
   const [hasError, setHasError] = useState(false); // Track if search returned no results
+
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     Modal.setAppElement("#__next");
+  //   }
+  // }, []);
 
   const loadMorePokemon = async (amount: number) => {
     if (lastLoadedId.current >= 721) {
@@ -213,16 +219,25 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="m-16 flex flex-col items-center justify-center min-h-screen">
-        <div ref={searchBarRef} className="flex items-center p-8">
-          <SearchBar onSearch={handleSearch} hasError={hasError} />
-          <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {(isSearching || loading || hasError)
-            ? Array.from({ length: 20 }).map((_, index) => (
+        {/* Outer container to align both utility bar and grid */}
+        <div className="max-w-screen-xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+          {/* Utility bar */}
+          <div
+            ref={searchBarRef}
+            className="flex flex-col sm:flex-row items-center sm:space-x-4 w-full space-y-4 sm:space-y-0 pb-4"
+          >
+            <SearchBar onSearch={handleSearch} hasError={hasError} />
+            <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
+          </div>
+
+          {/* Pokemon grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {(isSearching || loading || hasError)
+              ? Array.from({ length: 20 }).map((_, index) => (
                 <PokemonSkeleton key={index} />
               ))
-            : filteredPokemon.map((pokemon) => (
+              : filteredPokemon.map((pokemon) => (
                 <Pokemon
                   id={pokemon.id}
                   key={pokemon.id}
@@ -236,13 +251,18 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
                   onClick={() => openModal(pokemon)}
                 />
               ))}
-        </div>
-        {lastLoadedId.current < 721 && (
-          <div ref={loader} className="loader mt-4">
-            <LoadingState loading={loading} showLoader={showLoader} />
           </div>
-        )}
+
+          {/* Loading indicator */}
+          {lastLoadedId.current < 721 && (
+            <div ref={loader} className="loader mt-4">
+              <LoadingState loading={loading} showLoader={showLoader} />
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Modal and Back to Top Button */}
       <PokemonDetail
         isOpen={isModalOpen}
         onRequestClose={closeModal}
@@ -257,6 +277,7 @@ const PokemonList: React.FC<PokemonDetailProps> = ({ initialPokemon }) => {
       )}
     </div>
   );
+
 };
 
 export default PokemonList;
