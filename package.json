@@ -2,6 +2,7 @@
   "name": "mypokedex",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,14 +12,17 @@
   "dependencies": {
     "@headlessui/react": "^2.1.10",
     "@heroicons/react": "^2.1.5",
+    "dotenv": "^16.4.7",
     "gray-matter": "^4.0.3",
+    "marked": "^15.0.3",
     "nekosapi": "^0.6.3",
     "next": "14.2.14",
+    "node-fetch": "^3.3.2",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^20.17.10",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-modal": "^3.16.3",
@@ -27,6 +31,7 @@
     "postcss": "^8",
     "react-modal": "^3.16.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
   }
 }
